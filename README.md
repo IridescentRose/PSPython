@@ -31,3 +31,10 @@ LIGHT_MAGENTA
 LIGHT_YELLOW
 WHITE
 ```
+
+The `create` function takes 3 arguments, `r`, `g`, and `b`, which are the red, green, and blue values respectively.
+Each value must be between 0 and 255.
+
+```
+psp.color.create(r, g, b)
+```
