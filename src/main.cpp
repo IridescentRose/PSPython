@@ -4,6 +4,7 @@
 #include <pspdisplay.h>
 #include <pspdebug.h>
 #include <pspkernel.h>
+#include "psp.hpp"
 
 auto setup_vm_output(pkpy::VM* vm) {
     vm->_stdout = [](pkpy::VM* vm, const pkpy::Str& s) {
@@ -22,30 +23,6 @@ auto setup_vm_output(pkpy::VM* vm) {
         std::cerr << s << std::endl;
         throw std::runtime_error("Python error");
     };
-}
-
-auto make_color(u8 r, u8 g, u8 b) -> u32 {
-    return 0xFF000000 | (r << 16) | (g << 8) | b;
-}
-
-auto psp_text_color(int color) {
-    pspDebugScreenSetTextColor(color);
-}
-
-auto setup_vm_psp_module(pkpy::VM* vm, pkpy::PyObject* mod) {
-    using namespace pkpy;
-
-    ModuleBuilder builder(vm, mod);
-
-    builder.var("TEXT_COLOR_GRAY", make_color(0x80, 0x80, 0x80));
-    builder.func("make_color(r: int, g: int, b: int) -> int", [](VM* vm, ArgsView args) {
-        return VAR(make_color(CAST(u8, args[0]), CAST(u8, args[1]), CAST(u8, args[2])));
-    });
-
-    builder.func("text_color(color: int) -> void", [](VM* vm, ArgsView args) {
-        psp_text_color(CAST(u32, args[0]));
-        return vm->None;
-    });
 }
 
 auto main() -> int {

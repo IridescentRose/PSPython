@@ -1,4 +1,4 @@
 import psp
 
-psp.text_color(psp.TEXT_COLOR_GRAY)
+psp.text_color(psp.color.GRAY)
 print('Hello World!')
