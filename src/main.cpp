@@ -1,27 +1,9 @@
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <pocketpy.h>
+#include "Util.hpp"
+#include "ModuleBuilder.hpp"
 #include "platform.hpp"
 #include <pspdisplay.h>
 #include <pspdebug.h>
 #include <pspkernel.h>
-
-auto read_file_to_string(const std::string& path) -> std::string {
-    std::fstream file_in(path);
-
-    if(!file_in.is_open()) {
-        throw std::runtime_error("Failed to open file: " + path);
-    }
-
-    std::stringstream buffer;
-    buffer << file_in.rdbuf();
-
-    if(buffer.str().empty())
-        throw std::runtime_error("File is empty: " + path);
-
-    return buffer.str();
-}
 
 auto setup_vm_output(pkpy::VM* vm) {
     vm->_stdout = [](pkpy::VM* vm, const pkpy::Str& s) {
@@ -49,24 +31,6 @@ auto make_color(u8 r, u8 g, u8 b) -> u32 {
 auto psp_text_color(int color) {
     pspDebugScreenSetTextColor(color);
 }
-
-struct ModuleBuilder {
-    pkpy::VM* vm;
-    pkpy::PyObject* mod;
-
-    ModuleBuilder(pkpy::VM* vm, pkpy::PyObject* mod) : vm(vm), mod(mod) {}
-
-    template <typename T>
-    auto var(const std::string& name, T value) {
-        using namespace pkpy;
-        mod->attr().set(name.c_str(), VAR(value));
-    }
-
-    auto func(const std::string& layout, pkpy::NativeFuncC func) {
-        using namespace pkpy;
-        vm->bind(mod, layout.c_str(), func);
-    }
-};
 
 auto setup_vm_psp_module(pkpy::VM* vm, pkpy::PyObject* mod) {
     using namespace pkpy;
